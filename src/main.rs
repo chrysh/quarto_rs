@@ -1,3 +1,4 @@
+#![no_std] // Use this attribute to indicate no_std environment
 /*!
 Welcome to `quarto_rs`
 */
@@ -52,7 +53,7 @@ mod game;
 mod piece;
 mod rng;
 
-use std::{env::args, io::stdin};
+// TODO use std::{env::args, io::stdin};
 
 use game::ArrayBase;
 
@@ -66,9 +67,10 @@ use crate::{
 
 fn main() {
     if args().any(|x| x.contains("help") || x == "-h") {
-        let current_exe = std::env::current_exe().unwrap();
-        let current_exe_name = current_exe.file_name().unwrap().to_string_lossy();
-        println!(
+        // Orig: let current_exe = std::env::current_exe().unwrap();
+        // Orig: let current_exe_name = current_exe.file_name().unwrap().to_string_lossy();
+        let current_exe_name = "quarto_rs";
+        printk!(
             "Your friendly Quarto game.
 
 The game is played on a 4x4 board with 16 pieces. Each piece has four distinct
@@ -114,7 +116,7 @@ Good luck!
         let _ = seed.next();
         let seed_str = seed.next().unwrap();
         let Ok(seed) = seed_str.parse() else {
-            println!("Invalid seed: {seed_str}");
+            printk!("Invalid seed: {seed_str}");
             return;
         };
         game.seed = Some(seed);
@@ -134,7 +136,7 @@ Good luck!
 
     if args().any(|x| x == "--ai-simulation" || x == "-a") {
         if game.pvp {
-            println!("PvP mode and ai-simulation don't match.. :)");
+            printk!("PvP mode and ai-simulation don't match.. :)");
         } else {
             ai_simulation(&game);
         }
@@ -149,17 +151,17 @@ fn play(mut game: Game) {
     #[allow(clippy::cast_possible_truncation)]
     let seed = game.seed.unwrap_or_else(|| time_nanos() as u64);
 
-    println!("Game Seed: {seed}");
+    printk!("Game Seed: {seed}");
 
     let human = RomuDuoJrRand::with_seed(seed).choose([Player::PlayerOne, Player::PlayerTwo]);
     let mut ai = SimpleAi::with_seed(human.next(), seed);
 
     if !game.pvp {
-        println!("You are {human}.");
+        printk!("You are {human}.");
     }
 
-    println!();
-    println!("Let the games begin!");
+    printk!();
+    printk!("Let the games begin!");
 
     loop {
         game.pp();
@@ -173,9 +175,10 @@ fn play(mut game: Game) {
                 game.initial_move(next_piece).unwrap();
             } else {
                 loop {
-                    println!("Select x,y to put the piece to:");
+                    printk!("Select x,y to put the piece to:");
                     buf.clear();
-                    stdin().read_line(&mut buf).unwrap();
+                    // TODO: stdin().read_line(&mut buf).unwrap();
+                    buf = "1,1"
                     let base = game.array_base;
                     let pos = try_parse_pos(&buf).map(|(x, y)| (base.unbased(x), base.unbased(y)));
                     if let Ok(pos) = pos {
@@ -186,11 +189,11 @@ fn play(mut game: Game) {
                             }
                         }
                     }
-                    println!("Illegal move! The x,y value must be an empty place on the field!");
-                    println!();
+                    printk!("Illegal move! The x,y value must be an empty place on the field!");
+                    printk!();
                 }
             }
-            println!();
+            printk!();
         } else {
             game = ai.play_iteratively(&mut game);
         }
@@ -201,14 +204,15 @@ fn read_piece(game: &Game) -> Piece {
     let mut buf = String::with_capacity(16);
     let base = game.array_base;
     let piece_id: usize = loop {
-        println!(
+        printk!(
             "\n{}, please chose your opponent's next piece ({}-{}):",
             game.player(),
             base.based(0),
             base.based(game.remaining_pieces().len() - 1),
         );
         buf.clear();
-        stdin().read_line(&mut buf).unwrap();
+        // TODO stdin().read_line(&mut buf).unwrap();
+        buf = "1"
         let num = buf.trim().parse().map(|x| base.unbased(x));
         if let Ok(num) = num {
             if num < game.remaining_pieces().len() {
@@ -217,8 +221,8 @@ fn read_piece(game: &Game) -> Piece {
         }
         let buf = buf.strip_suffix('\n').unwrap();
         #[cfg(debug_assertions)]
-        println!("{:?} (str: '{buf}')", num.err());
-        println!("Illegal choice: '{buf}', please pick the id of a remaining piece:");
+        printk!("{:?} (str: '{buf}')", num.err());
+        printk!("Illegal choice: '{buf}', please pick the id of a remaining piece:");
         game.pp_remaining_pieces();
     };
     game.remaining_pieces()[piece_id]
@@ -228,7 +232,7 @@ fn read_piece(game: &Game) -> Piece {
 fn ai_simulation(base_game: &Game) {
     const ITERS: usize = 100;
 
-    let it = std::time::Instant::now();
+    // TODO let it = std::time::Instant::now();
 
     let mut ai_one_wins = 0;
     let mut ai_two_wins = 0;
@@ -238,7 +242,7 @@ fn ai_simulation(base_game: &Game) {
     let seed = base_game.seed.unwrap_or_else(|| time_nanos() as u64);
     let mut rng = RomuDuoJrRand::with_seed(seed);
 
-    println!("Using seed {seed}");
+    printk!("Using seed {seed}");
 
     'outer: for _ in 0..ITERS {
         let mut game = base_game.clone();
@@ -270,20 +274,20 @@ fn ai_simulation(base_game: &Game) {
         }
     }
 
-    let elapsed = it.elapsed();
+    // TODO let elapsed = it.elapsed();
 
-    println!(
+    printk!(
         "Did {} games in {} seconds({:05.3} games/sec)",
         ITERS,
         elapsed.as_secs(),
         ITERS as f64 / (elapsed.as_secs() as f64)
     );
-    println!(
+    printk!(
         "Did {} turns in total, average of {} turns per game",
         turns,
         turns as f64 / ITERS as f64
     );
-    println!(
+    printk!(
         "Player 1 had {} wins({}%), Player 2 had {} wins({}%).",
         ai_one_wins,
         (ai_one_wins as f64 / ITERS as f64) * 100.,
@@ -293,7 +297,7 @@ fn ai_simulation(base_game: &Game) {
     let draws = ITERS - ai_one_wins - ai_two_wins;
     let draw_percentage = (draws as f64 / ITERS as f64) * 100.;
 
-    println!("We had {draws} draws ({draw_percentage}%)");
+    printk!("We had {draws} draws ({draw_percentage}%)");
 }
 
 #[cfg(test)]

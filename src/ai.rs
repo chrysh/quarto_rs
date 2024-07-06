@@ -4,7 +4,9 @@ use crate::{
     piece::Piece,
     rng::RomuDuoJrRand,
 };
-use std::{collections::HashSet, time::Instant};
+// Orig: use std::{collections::HashSet, time::Instant};
+use core::collections::HashSet;
+// TODO: use core::time::Instant;
 
 #[allow(clippy::module_name_repetitions)]
 pub struct SimpleAi {

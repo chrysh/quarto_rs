@@ -102,7 +102,7 @@ impl Field {
     fn check_array_for_win(ary: &[Option<Piece>]) -> bool {
         assert!(ary.len() == 4);
 
-        let mut ret = std::u8::MAX;
+        let mut ret = core::u8::MAX;
 
         for piece in ary {
             if let Some(piece) = piece {

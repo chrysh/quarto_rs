@@ -1,4 +1,4 @@
-use std::fmt::Formatter;
+use core::fmt::Formatter;
 
 /// A quarto piece.
 #[derive(Default, PartialEq, Eq, Copy, Clone, Hash, Ord, PartialOrd)]
@@ -6,8 +6,8 @@ pub struct Piece {
     pub properties: u8,
 }
 
-impl std::fmt::Debug for Piece {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for Piece {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         self.pp_write(f)
     }
 }
@@ -35,7 +35,7 @@ impl Piece {
         (self.properties & prop as u8) != 0
     }
 
-    pub fn pp_write(self, f: &mut Formatter) -> std::fmt::Result {
+    pub fn pp_write(self, f: &mut Formatter) -> core::fmt::Result {
         f.write_str("[")?;
         if self.get(Property::Tall) {
             f.write_str("✋")?;

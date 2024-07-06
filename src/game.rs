@@ -21,7 +21,7 @@ impl Player {
 }
 
 impl Display for Player {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Player::PlayerOne => f.write_str("Player 1"),
             Player::PlayerTwo => f.write_str("Player 2"),
