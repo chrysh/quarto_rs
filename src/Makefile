@@ -17,4 +17,4 @@ modules_install:
 	$(MAKE) -C $(KERNEL_SRC) M=$(SRC) modules_install
 
 clean:
-	rm *.o *.ko *.mod.c *.mod Module.symvers modules.order
+	rm *.o *.ko *.mod.c *.mod Module.symvers modules.order .*.cmd .*.d
