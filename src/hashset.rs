@@ -2,29 +2,16 @@ mod djb2;
 
 use kernel::prelude::*;
 use kernel::vec;
-use alloc::vec::Vec;
+use alloc::vecExtra::VecExtra;
 
 use core::hash::{Hash, Hasher};
 use crate::hashset::djb2::DJB2Hasher;
-
-#[macro_export]
-macro_rules! vec {
-    // Match expressions like `vec![value; count]`
-    ($elem:expr; $count:expr) => {
-        {
-            let count = $count; // Capture the count to use in `with_capacity` and `resize`
-            let mut temp_vec = Vec::with_capacity(count, GFP_KERNEL);
-            temp_vec.resize(count, $elem); // Resize the vector, filling with the element
-            temp_vec.expect("Vector resize failed")
-        }
-    };
-}
 
 #[derive(Debug, Clone)]
 pub(crate) struct HashSet<T, H = DJB2Hasher>
     where T: Clone
 {
-    buckets: Vec<Option<T>>,
+    buckets: VecExtra<Option<T>>,
     capacity: usize,
     size: usize,
     hasher: H,
@@ -133,7 +120,7 @@ impl<T: Clone + Eq + Hash + core::fmt::Debug, H: Hasher> HashSet<T, H> {
     fn resize(&mut self) {
         let new_cap = self.capacity *2;
         let mut new_buckets = vec![None; new_cap];
-        let current_items: Vec<_> = self.buckets.iter().cloned().collect();
+        let current_items: VecExtra<_> = self.buckets.iter().cloned().collect();
 
         for item_option in current_items {
             if let Some(item) = item_option {
@@ -209,8 +196,8 @@ impl<T: Clone + Eq + Hash + core::fmt::Debug, H: Hasher> HashSet<T, H> {
     }
 
     // get all the elements that are in the first set but not the second.
-    pub fn difference(&mut self, other: &mut HashSet<T, H>) -> Vec<T> {
-        let mut diff = Vec::new();
+    pub fn difference(&mut self, other: &mut HashSet<T, H>) -> VecExtra<T> {
+        let mut diff = VecExtra::new();
         let buckets = self.buckets.clone();
         for bucket in &buckets {
             if let Some(ref item) = bucket {
@@ -224,8 +211,8 @@ impl<T: Clone + Eq + Hash + core::fmt::Debug, H: Hasher> HashSet<T, H> {
     }
 
     // get all the unique elements in both sets.
-    pub fn union(&mut self, other: &mut HashSet<T, H>) -> Vec<T> {
-        let mut union = Vec::new();
+    pub fn union(&mut self, other: &mut HashSet<T, H>) -> VecExtra<T> {
+        let mut union = VecExtra::new();
         for bucket in &self.buckets {
             if let Some(ref item) = bucket {
                 union.push(item.clone(), GFP_KERNEL);
@@ -242,8 +229,8 @@ impl<T: Clone + Eq + Hash + core::fmt::Debug, H: Hasher> HashSet<T, H> {
     }
 
     // get all the elements that are only in both sets.
-    pub fn intersection(&mut self, other: &mut HashSet<T, H>) -> Vec<T> {
-        let mut intersection = Vec::new();
+    pub fn intersection(&mut self, other: &mut HashSet<T, H>) -> VecExtra<T> {
+        let mut intersection = VecExtra::new();
         for bucket in &self.buckets {
             if let Some(ref item) = bucket {
                 if other.contains(item) {
@@ -255,8 +242,8 @@ impl<T: Clone + Eq + Hash + core::fmt::Debug, H: Hasher> HashSet<T, H> {
     }
 
     // Get all the elements that are in one set or the other, but not both.
-    pub fn symmetric_difference(&mut self, other: &mut HashSet<T, H>) -> Vec<T> {
-        let mut sym_diff = Vec::new();
+    pub fn symmetric_difference(&mut self, other: &mut HashSet<T, H>) -> VecExtra<T> {
+        let mut sym_diff = VecExtra::new();
         for bucket in &self.buckets {
             if let Some(ref item) = bucket {
                 if !other.contains(item) {
