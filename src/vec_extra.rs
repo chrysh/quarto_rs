@@ -1,15 +1,14 @@
-use kernel::prelude::*;
+use ::kernel::prelude::*;
 use core::ops::Deref;
 use core::ops::DerefMut;
 
-
 #[macro_export]
 macro_rules! vec {
-    // Match expressions like `vec![value; count]`
+    // Match expressions like `vecExtra![value; count]`
     ($elem:expr; $count:expr) => {
         {
             let count = $count; // Capture the count to use in `with_capacity` and `resize`
-            let mut temp_vec = Vec::with_capacity(count, GFP_KERNEL);
+            let mut temp_vec = VecExtra::with_capacity(count, GFP_KERNEL);
             temp_vec.resize(count, $elem); // Resize the vector, filling with the element
             temp_vec.expect("Vector resize failed")
         }
