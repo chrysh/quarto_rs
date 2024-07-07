@@ -2,7 +2,7 @@
 
 # obj-$(CONFIG_SAMPLE_RUST_QUARTO)		+= rust_quarto.o
 obj-m += rust_quarto.o
-KERNEL_SRC := ~/code/kernel/net-next
+KERNEL_SRC := ~/code/kernel/Rust-for-Linux/
 SRC := $(shell pwd)
 
 # Don't forget the following:
@@ -16,3 +16,5 @@ all:
 modules_install:
 	$(MAKE) -C $(KERNEL_SRC) M=$(SRC) modules_install
 
+clean:
+	rm *.o *.ko *.mod.c *.mod Module.symvers modules.order
