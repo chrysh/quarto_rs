@@ -46,7 +46,7 @@ impl SimpleAi {
             } => {
                 assert!(self.own_player == player);
                 if game.ai_reasoning {
-                    println!("AI: Does not matter which piece we pick on the initial move.");
+                    pr_info!("AI: Does not matter which piece we pick on the initial move.");
                 }
                 // return a random piece from `remaining_pieces`
                 let random_piece = *self.rng.choose(game.remaining_pieces());
@@ -68,7 +68,7 @@ impl SimpleAi {
                 // Grab the empty spaces.
                 let empty_spaces = t_game.field.empty_spaces();
                 if game.ai_reasoning {
-                    println!(
+                    pr_info!(
                         "AI: There are {} empty spaces for us to put our piece on",
                         empty_spaces.len()
                     );
@@ -104,7 +104,7 @@ impl SimpleAi {
                 }
 
                 if game.ai_reasoning {
-                    println!("AI: We have {} states for our move", states.len());
+                    pr_info!("AI: We have {} states for our move", states.len());
                 }
 
                 // This tracks which states we will remove after we calculate for the adversary.
@@ -130,7 +130,7 @@ impl SimpleAi {
 
                             // Check if any of these moves are winning.
                             if new_state.field.check_field_for_win() && game.ai_reasoning {
-                                println!("Piece: {piece:?} will let opponent win on pos {pos:?} if we place ours({our_piece:?}) on {pos:?}");
+                                pr_info!("Piece: {piece:?} will let opponent win on pos {pos:?} if we place ours({our_piece:?}) on {pos:?}");
                                 // remove these states from the states vector.
                                 removals.push(state_idx);
                                 // Add the piece to the non_picks.
@@ -142,8 +142,8 @@ impl SimpleAi {
 
                 let remaining_pieces = game.remaining_pieces().iter().collect::<HashSet<_>>();
                 if game.ai_reasoning {
-                    println!("AI: Game has {} remaining pieces", remaining_pieces.len());
-                    println!(
+                    pr_info!("AI: Game has {} remaining pieces", remaining_pieces.len());
+                    pr_info!(
                         "AI: We have {} pieces that we want to avoid",
                         non_picks.len()
                     );
@@ -155,14 +155,14 @@ impl SimpleAi {
                     .collect();
 
                 if game.ai_reasoning {
-                    println!("AI: calculated all states that we can put things on without our opponent immediately winning after {:.4} us", it.unwrap().elapsed().as_micros());
+                    pr_info!("AI: calculated all states that we can put things on without our opponent immediately winning after {:.4} us", it.unwrap().elapsed().as_micros());
                 }
 
                 // This means, our opponent will definitely win next round or it is a draw :(
                 // Just shortcut and pick any piece.
                 if potential_picks.is_empty() {
                     if game.ai_reasoning {
-                        println!("AI: Loss is imminent, just give a random piece");
+                        pr_info!("AI: Loss is imminent, just give a random piece");
                     }
                     if game.remaining_pieces().is_empty() {
                         // This will be a draw.
@@ -192,7 +192,7 @@ impl SimpleAi {
                 // Oh no! we cannot avoid a game loss here. Just return.
                 if states.is_empty() {
                     if game.ai_reasoning {
-                        println!("AI: We will lose on the next move, wherever we place our piece and whichever piece we select! :<");
+                        pr_info!("AI: We will lose on the next move, wherever we place our piece and whichever piece we select! :<");
                     }
                     // return a random piece from `remaining_pieces`
                     let random_piece = *self.rng.choose(game.remaining_pieces());

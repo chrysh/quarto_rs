@@ -148,35 +148,35 @@ impl Game {
     }
 
     pub fn pp(&self) {
-        println!("Quarto, round: {}", self.round());
-        println!();
+        pr_info!("Quarto, round: {}", self.round());
+        pr_info!();
         if self.running() {
-            println!("{}, your move.", self.player());
+            pr_info!("{}, your move.", self.player());
         } else if let Some(winner) = self.winner() {
-            println!("{winner} won!");
+            pr_info!("{winner} won!");
         } else {
-            println!("Game ended in a draw!");
+            pr_info!("Game ended in a draw!");
         }
 
         if !self.remaining_pieces().is_empty() {
-            println!("\nRemaining Pieces:");
+            pr_info!("\nRemaining Pieces:");
             self.pp_remaining_pieces();
         }
-        println!("\nField:");
+        pr_info!("\nField:");
         self.field.pp(self.array_base);
 
         if let Some(piece) = self.next_piece() {
-            println!("\nThe next piece to place is:");
+            pr_info!("\nThe next piece to place is:");
             print!("       ");
             piece.pp();
-            println!();
+            pr_info!();
         }
     }
 
     pub fn pp_remaining_pieces(&self) {
         for (i, piece) in self.remaining_pieces().iter().enumerate() {
             if i > 0 && (i) % 3 == 0 {
-                println!();
+                pr_info!();
             }
             let based_i = self.array_base.based(i);
             print!("  {based_i}: ");
@@ -189,7 +189,7 @@ impl Game {
                 print!(",  ");
             }
         }
-        println!();
+        pr_info!();
     }
 
     /// Returns the list of remaining pieces

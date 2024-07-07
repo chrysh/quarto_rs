@@ -135,15 +135,15 @@ impl Field {
             for (x, val) in (row).iter().enumerate() {
                 if x == 0 {
                     if y > 0 {
-                        println!();
-                        println!("  > ---------- + ---------- + ---------- + ---------- <");
+                        pr_info!();
+                        pr_info!("  > ---------- + ---------- + ---------- + ---------- <");
                     } else {
                         if array_base == ArrayBase::Zero {
-                            println!("        0            1            2            3       ");
+                            pr_info!("        0            1            2            3       ");
                         } else {
-                            println!("        1            2            3            4       ");
+                            pr_info!("        1            2            3            4       ");
                         }
-                        println!("  . ---------- . ---------- . ---------- . ---------- .");
+                        pr_info!("  . ---------- . ---------- . ---------- . ---------- .");
                     }
                     let based_y = array_base.based(y);
                     print!("{based_y} | ");
@@ -160,8 +160,8 @@ impl Field {
                 }
             }
         }
-        println!();
-        println!("  ^ ---------- ^ ---------- ^ ---------- ^ ---------- ^");
+        pr_info!();
+        pr_info!("  ^ ---------- ^ ---------- ^ ---------- ^ ---------- ^");
     }
 }
 
