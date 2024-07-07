@@ -32,6 +32,15 @@ impl Hash for Piece {
 impl kernel::Module for QuartoModule {
     fn init(_module: &'static ThisModule) -> Result<Self> {
         pr_info!("Loading Quarto Rust module\n");
+
+        let remaining_pieces_vec = vec![ 1 ,2, 4 ];
+        let mut remaining_pieces = remaining_pieces_vec
+           .iter()
+           .copied()
+           .collect::<HashSet<_>>();
+        let mut foobar = remaining_pieces.clone();
+        foobar.remove(&2);
+
         Ok(QuartoModule)
     }
 }
