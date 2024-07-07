@@ -2,7 +2,7 @@
 
 # obj-$(CONFIG_SAMPLE_RUST_QUARTO)		+= rust_quarto.o
 obj-m += rust_quarto.o
-KERNEL_SRC := ~/code/kernel/Rust-for-Linux/
+KERNEL_SRC := ~/code/kernel/net-next/
 SRC := $(shell pwd)
 
 # Don't forget the following:
