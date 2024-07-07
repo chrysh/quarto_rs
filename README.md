@@ -1,11 +1,26 @@
 # Quarto-rs
 
-Your friendly Quarto game.
+Your friendly Quarto game (TBD).
 
-Install using `cargo install quarto` or clone this repo and `cargo run`
+## Quarto Out-of-tree kernel module
 
-On NetBSD, a package is available from the official repositories.
-To install it, simply run `pkgin install quarto`.
+Compile the module
+
+```
+$ export PATH="$HOME/.cargo/bin:$PATH"
+$ export LIBCLANG_PATH=/usr/lib/llvm-16/lib
+$ export LLVM=1
+
+$ KSRC=~/code/kernel
+
+$ make -C $KSRC M=$(pwd) rustavailable
+```
+
+For more information, check out [my blog](https://blog.christina-quast.de).
+
+<!--
+## Game play
+TBD
 
 ![Quarto In-Game Screenshot](quarto.png?raw=true "Quarto In-Game Screenshot")
 
@@ -38,7 +53,7 @@ Options:
 ```
 
 Good luck!
-
+-->
 
 #### License
 
@@ -48,11 +63,5 @@ Licensed under either of <a href="LICENSE-APACHE">Apache License, Version
 </sup>
 
 <br>
-
-<sub>
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in this crate by you, as defined in the Apache-2.0 license, shall
-be dual licensed as above, without any additional terms or conditions.
-</sub>
 
 <br>
