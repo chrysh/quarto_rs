@@ -52,6 +52,9 @@ mod field;
 mod game;
 mod piece;
 mod rng;
+mod hashset;
+mod vec_extra;
+mod rust_quarto;
 
 // TODO use std::{env::args, io::stdin};
 
@@ -70,7 +73,7 @@ fn main() {
         // Orig: let current_exe = std::env::current_exe().unwrap();
         // Orig: let current_exe_name = current_exe.file_name().unwrap().to_string_lossy();
         let current_exe_name = "quarto_rs";
-        printk!(
+        pr_info!(
             "Your friendly Quarto game.
 
 The game is played on a 4x4 board with 16 pieces. Each piece has four distinct
@@ -116,7 +119,7 @@ Good luck!
         let _ = seed.next();
         let seed_str = seed.next().unwrap();
         let Ok(seed) = seed_str.parse() else {
-            printk!("Invalid seed: {seed_str}");
+            pr_info!("Invalid seed: {seed_str}");
             return;
         };
         game.seed = Some(seed);
@@ -136,7 +139,7 @@ Good luck!
 
     if args().any(|x| x == "--ai-simulation" || x == "-a") {
         if game.pvp {
-            printk!("PvP mode and ai-simulation don't match.. :)");
+            pr_info!("PvP mode and ai-simulation don't match.. :)");
         } else {
             ai_simulation(&game);
         }
@@ -151,17 +154,17 @@ fn play(mut game: Game) {
     #[allow(clippy::cast_possible_truncation)]
     let seed = game.seed.unwrap_or_else(|| time_nanos() as u64);
 
-    printk!("Game Seed: {seed}");
+    pr_info!("Game Seed: {seed}");
 
     let human = RomuDuoJrRand::with_seed(seed).choose([Player::PlayerOne, Player::PlayerTwo]);
     let mut ai = SimpleAi::with_seed(human.next(), seed);
 
     if !game.pvp {
-        printk!("You are {human}.");
+        pr_info!("You are {human}.");
     }
 
-    printk!();
-    printk!("Let the games begin!");
+    pr_info!();
+    pr_info!("Let the games begin!");
 
     loop {
         game.pp();
@@ -175,7 +178,7 @@ fn play(mut game: Game) {
                 game.initial_move(next_piece).unwrap();
             } else {
                 loop {
-                    printk!("Select x,y to put the piece to:");
+                    pr_info!("Select x,y to put the piece to:");
                     buf.clear();
                     // TODO: stdin().read_line(&mut buf).unwrap();
                     buf = "1,1"
@@ -189,11 +192,11 @@ fn play(mut game: Game) {
                             }
                         }
                     }
-                    printk!("Illegal move! The x,y value must be an empty place on the field!");
-                    printk!();
+                    pr_info!("Illegal move! The x,y value must be an empty place on the field!");
+                    pr_info!();
                 }
             }
-            printk!();
+            pr_info!();
         } else {
             game = ai.play_iteratively(&mut game);
         }
@@ -204,7 +207,7 @@ fn read_piece(game: &Game) -> Piece {
     let mut buf = String::with_capacity(16);
     let base = game.array_base;
     let piece_id: usize = loop {
-        printk!(
+        pr_info!(
             "\n{}, please chose your opponent's next piece ({}-{}):",
             game.player(),
             base.based(0),
@@ -221,8 +224,8 @@ fn read_piece(game: &Game) -> Piece {
         }
         let buf = buf.strip_suffix('\n').unwrap();
         #[cfg(debug_assertions)]
-        printk!("{:?} (str: '{buf}')", num.err());
-        printk!("Illegal choice: '{buf}', please pick the id of a remaining piece:");
+        pr_info!("{:?} (str: '{buf}')", num.err());
+        pr_info!("Illegal choice: '{buf}', please pick the id of a remaining piece:");
         game.pp_remaining_pieces();
     };
     game.remaining_pieces()[piece_id]
@@ -242,7 +245,7 @@ fn ai_simulation(base_game: &Game) {
     let seed = base_game.seed.unwrap_or_else(|| time_nanos() as u64);
     let mut rng = RomuDuoJrRand::with_seed(seed);
 
-    printk!("Using seed {seed}");
+    pr_info!("Using seed {seed}");
 
     'outer: for _ in 0..ITERS {
         let mut game = base_game.clone();
@@ -276,18 +279,18 @@ fn ai_simulation(base_game: &Game) {
 
     // TODO let elapsed = it.elapsed();
 
-    printk!(
+    pr_info!(
         "Did {} games in {} seconds({:05.3} games/sec)",
         ITERS,
         elapsed.as_secs(),
         ITERS as f64 / (elapsed.as_secs() as f64)
     );
-    printk!(
+    pr_info!(
         "Did {} turns in total, average of {} turns per game",
         turns,
         turns as f64 / ITERS as f64
     );
-    printk!(
+    pr_info!(
         "Player 1 had {} wins({}%), Player 2 had {} wins({}%).",
         ai_one_wins,
         (ai_one_wins as f64 / ITERS as f64) * 100.,
@@ -297,7 +300,7 @@ fn ai_simulation(base_game: &Game) {
     let draws = ITERS - ai_one_wins - ai_two_wins;
     let draw_percentage = (draws as f64 / ITERS as f64) * 100.;
 
-    printk!("We had {draws} draws ({draw_percentage}%)");
+    pr_info!("We had {draws} draws ({draw_percentage}%)");
 }
 
 #[cfg(test)]
