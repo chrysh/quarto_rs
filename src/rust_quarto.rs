@@ -2,12 +2,15 @@
 //! Rust Quarto game for Linux kernel
 
 use kernel::prelude::*;
-use alloc::vec::Vec;
+
+#[macro_use]
+pub mod vec_extra;
+mod hashset;
 
 use core::hash::{Hash, Hasher};
-use self::hashset::HashSet;
-
-mod hashset;
+use crate::hashset::HashSet;
+// Needed for macro vec!
+use crate::vec_extra::VecExtra;
 
 module! {
     type: QuartoModule,

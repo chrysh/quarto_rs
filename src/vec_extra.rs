@@ -1,6 +1,7 @@
-use ::kernel::prelude::*;
-use core::ops::Deref;
-use core::ops::DerefMut;
+
+use kernel::prelude::*;
+use core::ops::{Deref, DerefMut};
+use alloc::collections::TryReserveError;
 
 #[macro_export]
 macro_rules! vec {
@@ -8,9 +9,23 @@ macro_rules! vec {
     ($elem:expr; $count:expr) => {
         {
             let count = $count; // Capture the count to use in `with_capacity` and `resize`
-            let mut temp_vec = VecExtra::with_capacity(count, GFP_KERNEL);
-            temp_vec.resize(count, $elem); // Resize the vector, filling with the element
-            temp_vec.expect("Vector resize failed")
+            let mut temp_vec = VecExtra::with_capacity(count).expect("Failed to allocate memory for VecExtra"); // Handle potential allocation failure;
+
+            for _ in 0..count {
+                temp_vec.try_push($elem).expect("Vector push failed"); // Resize the vector, filling with the element
+            }
+            temp_vec
+        }
+    };
+
+    // Match expressions like `vecExtra![value, ..]`
+    ( $($x:expr),* $(,)? ) => {
+        {
+            let mut temp_vec = VecExtra::new();
+            $(
+                temp_vec.try_push($x).expect("Vector push failed");
+            )*
+            temp_vec
         }
     };
 }
@@ -51,8 +66,8 @@ impl<T> VecExtra<T> {
     ///
     /// * `Ok(Self)` - If the `VecExtra<T>` is successfully created.
     /// * `Err(super::AllocError)` - If there is an allocation error.
-    pub fn with_capacity(capacity: usize) -> Result<Self, super::AllocError> {
-        let v = Vec::with_capacity(capacity, GFP_KERNEL);
+    pub fn with_capacity(capacity: usize) -> Result<Self, TryReserveError> {
+        let v = Vec::try_with_capacity(capacity);
         match v {
             Ok(v) => Ok(VecExtra(v)),
             Err(e) => Err(e),
@@ -60,13 +75,35 @@ impl<T> VecExtra<T> {
     }
 }
 
+// Implement IntoIterator for VecExtra<T>
+impl<T> IntoIterator for VecExtra<T> {
+    fn into_iter(self) -> dyn IntoIterator<Item = T> {
+        self.0.into_iter()
+    }
+}
+
+// Implement IntoIterator for &VecExtra<T>
+impl<'a, T> IntoIterator for &'a VecExtra<T> {
+    fn into_iter(self) -> dyn IntoIterator<Item = T> {
+        self.0.iter()
+    }
+}
+
+// Implement IntoIterator for &mut VecExtra<T>
+impl<'a, T> IntoIterator for &'a mut VecExtra<T> {
+    fn into_iter(self) -> dyn IntoIterator<Item = T> {
+        self.0.iter_mut()
+    }
+}
+
+
 impl<T: Clone> Clone for VecExtra<T> {
     /// Creates a new `VecExtra<T>` with the same elements as the original.
     fn clone(&self) -> Self {
         let mut vec = Vec::new();
         vec.try_reserve(self.len()).unwrap();
         for elem in self.iter() {
-            let _ = vec.push(elem.clone(), GFP_KERNEL);
+            let _ = vec.try_push(elem.clone());
         }
         VecExtra(vec)
     }
@@ -86,7 +123,7 @@ impl<T> FromIterator<T> for VecExtra<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> VecExtra<T> {
         let mut vec = Vec::new();
         for i in iter {
-            let _ = vec.push(i, GFP_KERNEL);
+            let _ = vec.try_push(i);
         }
         VecExtra(vec)
     }
