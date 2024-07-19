@@ -2,6 +2,7 @@
 use kernel::prelude::*;
 use core::ops::{Deref, DerefMut};
 use alloc::collections::TryReserveError;
+use alloc::collections::Vec;
 
 #[macro_export]
 macro_rules! vec {
@@ -77,21 +78,29 @@ impl<T> VecExtra<T> {
 
 // Implement IntoIterator for VecExtra<T>
 impl<T> IntoIterator for VecExtra<T> {
-    fn into_iter(self) -> dyn IntoIterator<Item = T> {
+    type Item = <Vec<T> as IntoIterator>::Item;
+    type IntoIter = <Vec<T> as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> impl IntoIterator<Item = T> {
         self.0.into_iter()
     }
 }
 
 // Implement IntoIterator for &VecExtra<T>
 impl<'a, T> IntoIterator for &'a VecExtra<T> {
-    fn into_iter(self) -> dyn IntoIterator<Item = T> {
+    type Item = <&'a Vec<T> as IntoIterator>::Item;
+    type IntoIter = <&'a Vec<T> as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> impl  IntoIterator<Item = T> {
         self.0.iter()
     }
 }
 
 // Implement IntoIterator for &mut VecExtra<T>
 impl<'a, T> IntoIterator for &'a mut VecExtra<T> {
-    fn into_iter(self) -> dyn IntoIterator<Item = T> {
+    type Item = <&'a mut Vec<T> as IntoIterator>::Item;
+    type IntoIter = <&'a mut Vec<T> as IntoIterator>::IntoIter;
+    fn into_iter(self) -> impl IntoIterator<Item = T> {
         self.0.iter_mut()
     }
 }
