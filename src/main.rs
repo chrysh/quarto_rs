@@ -52,7 +52,7 @@ mod field;
 mod game;
 mod piece;
 mod rng;
-mod hashset;
+pub mod hashset;
 mod vec_extra;
 mod rust_quarto;
 

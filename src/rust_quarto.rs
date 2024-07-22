@@ -37,7 +37,7 @@ impl kernel::Module for QuartoModule {
         pr_info!("Loading Quarto Rust module\n");
 
         let remaining_pieces_vec = vec![ 1 ,2, 4 ];
-        let mut remaining_pieces = remaining_pieces_vec
+        let remaining_pieces = remaining_pieces_vec
            .iter()
            .copied()
            .collect::<HashSet<_>>();

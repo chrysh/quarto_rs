@@ -9,7 +9,7 @@ use core::hash::{Hash, Hasher};
 use crate::hashset::djb2::DJB2Hasher;
 
 #[derive(Debug, Clone)]
-pub(crate) struct HashSet<T, H = DJB2Hasher>
+pub struct HashSet<T, H = DJB2Hasher>
     where T: Clone
 {
     buckets: VecExtra<Option<T>>,
@@ -203,7 +203,7 @@ impl<T: Clone + Eq + Hash + core::fmt::Debug, H: Hasher> HashSet<T, H> {
         for bucket in &buckets {
             if let Some(ref item) = bucket {
                 if !other.contains(item) {
-                    diff.try_push(item.clone());
+                    let _ = diff.try_push(item.clone());
                     pr_info!("Pushing {:?}", item);
                 }
             }
@@ -216,13 +216,13 @@ impl<T: Clone + Eq + Hash + core::fmt::Debug, H: Hasher> HashSet<T, H> {
         let mut union = VecExtra::new();
         for bucket in &self.buckets {
             if let Some(ref item) = bucket {
-                union.try_push(item.clone());
+                let _ = union.try_push(item.clone());
             }
         }
         for bucket in &other.buckets {
             if let Some(ref item) = bucket {
                 if !self.contains(item) {
-                    union.try_push(item.clone());
+                    let _ = union.try_push(item.clone());
                 }
             }
         }
@@ -235,7 +235,7 @@ impl<T: Clone + Eq + Hash + core::fmt::Debug, H: Hasher> HashSet<T, H> {
         for bucket in &self.buckets {
             if let Some(ref item) = bucket {
                 if other.contains(item) {
-                    intersection.try_push(item.clone());
+                    let _ = intersection.try_push(item.clone());
                 }
             }
         }
@@ -248,14 +248,14 @@ impl<T: Clone + Eq + Hash + core::fmt::Debug, H: Hasher> HashSet<T, H> {
         for bucket in &self.buckets {
             if let Some(ref item) = bucket {
                 if !other.contains(item) {
-                    sym_diff.try_push(item.clone());
+                    let _ = sym_diff.try_push(item.clone());
                 }
             }
         }
         for bucket in &other.buckets {
             if let Some(ref item) = bucket {
                 if !self.contains(item) {
-                    sym_diff.try_push(item.clone());
+                    let _ = sym_diff.try_push(item.clone());
                 }
             }
         }
